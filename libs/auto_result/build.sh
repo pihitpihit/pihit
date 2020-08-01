@@ -1,4 +1,4 @@
-if g++ -g -std=c++14 -o test main.cpp result.cpp
+if g++ -g -std=c++14 -o test main.cpp auto_result.cpp
 then
 	echo Build Success
 	./test

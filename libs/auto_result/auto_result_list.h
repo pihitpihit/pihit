@@ -1,4 +1,4 @@
-#include "result_maker.h"
+#include "auto_result_maker.h"
 
 ResultMakerStart()
 ResultMaker( Success )

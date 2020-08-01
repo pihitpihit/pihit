@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "result.h"
+#include "auto_result.h"
 
 void foo()
 {

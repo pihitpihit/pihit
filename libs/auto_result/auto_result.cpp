@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <execinfo.h>
-#include "result.h"
-//#include <experimental/source_location>
+#include "auto_result.h"
 
 #define REPORT_NONE			( 0x00000000 )
 #define REPORT_ON_ASSIGN	( 0x00000001 )

@@ -6,14 +6,14 @@
 
 char* demangle( const char* mangledName );
 
-#define AUTO_POSITION_IN	\
-	const char* file,\
-	const int   line,\
+#define AUTO_POSITION_IN    \
+	const char* file,       \
+	const int   line,       \
 	const char* func
 
-#define AUTO_POSITION	\
-	const char* file = __builtin_FILE(),\
-	const int   line = __builtin_LINE(),\
+#define AUTO_POSITION                       \
+	const char* file = __builtin_FILE(),    \
+	const int   line = __builtin_LINE(),    \
 	const char* func = __builtin_FUNCTION()
 
 #define AUTO_POSITION_PASS	file, line, func
@@ -28,6 +28,9 @@ class exception_t: public std::exception
 
 class result_record;
 
+/*************************/
+/* Result-Exception Code */
+/*************************/
 class result_code: public exception_t
 {
 	public:
@@ -49,6 +52,9 @@ class result_code: public exception_t
 		const result_code* result_;
 };
 
+/*************************/
+/* Result-Exception Type */
+/*************************/
 class result_t: public exception_t
 {
 	protected:
@@ -82,6 +88,9 @@ class result_t: public exception_t
 		const char* func_;
 };
 
+/***********************************/
+/* Result-Exception Record Manager */
+/***********************************/
 class result_record: public exception_t
 {
 	friend class result_code;
@@ -157,16 +166,16 @@ class result_record: public exception_t
 #if defined(__ResultMaker_Enumeration__)
 #	ifndef __ResultMaker_Enumeration_Done__
 #	define __ResultMaker_Enumeration_Done__
-#		define ResultMakerStart()		enum class ResultCode {
-#		define ResultMaker( ... )			KiMacroGetArg1( __VA_ARGS__ ),
-#		define ResultMakerEnd()			};
+#		define ResultMakerStart()       enum class ResultCode {
+#		define ResultMaker( ... )           KiMacroGetArg1( __VA_ARGS__ ),
+#		define ResultMakerEnd()         };
 #	endif//__ResultMaker_Enumeration_Done__
 #elif defined(__ResultMaker_Class__)
 #	ifndef __ResultMaker_Class_Done__
 #	define __ResultMaker_Class_Done__
-#		define ResultMakerStart()		namespace Result {
-#		define ResultMaker( ... )			ResultClassMaker( __VA_ARGS__ )
-#		define ResultMakerEnd()			};
+#		define ResultMakerStart()       namespace Result {
+#		define ResultMaker( ... )           ResultClassMaker( __VA_ARGS__ )
+#		define ResultMakerEnd()         };
 #	endif//__ResultMaker_Class_Done__
 #else
 #	ifndef __ResultMaker_Dummy__
