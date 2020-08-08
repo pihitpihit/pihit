@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <execinfo.h>
+#include <errno.h>
 #include "auto_result.h"
 
 #define REPORT_NONE			( 0x00000000 )
@@ -68,6 +69,10 @@ result_t::result_t( const result_record& result, AUTO_POSITION_IN ):
 	{
 		initLog();
 	}
+}
+result_t::result_t( const int error ):
+	result_t( ErrorToResult( error ) )
+{
 }
 result_t::~result_t()
 {
@@ -146,6 +151,10 @@ result_t& result_t::operator=( const result_record& result )
 	}
 
 	return *this;
+}
+result_t& result_t::operator=( const int error )
+{
+	return operator=( ErrorToResult( error ) );
 }
 const char* result_t::name() const
 {
@@ -297,5 +306,16 @@ result_record& result_record::byThrow()
 {
 	addType( REPORT_BY_THROW );
 	return *this;
+}
+
+result_t ErrorToResult( const int error )
+{
+	switch( error )
+	{
+	case ETIMEDOUT:
+		return Result::Timeout;
+	default:
+		return Result::Internal;
+	}
 }
 

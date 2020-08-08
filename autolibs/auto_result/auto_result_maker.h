@@ -63,6 +63,7 @@ class result_t: public exception_t
 		result_t( const result_t& result, AUTO_POSITION );
 		result_t( const result_code& result, AUTO_POSITION );
 		result_t( const result_record& result, AUTO_POSITION );
+		result_t( const int error );
 		~result_t();
 	public:
 		uint32_t id() const;
@@ -70,6 +71,7 @@ class result_t: public exception_t
 		result_t& operator=( const result_t& result );
 		result_t& operator=( const result_code& result );
 		result_t& operator=( const result_record& result );
+		result_t& operator=( const int error );
 		const char* name() const override;
 		const char* desc() const override;
 		const char* what() const noexcept override;
@@ -87,6 +89,11 @@ class result_t: public exception_t
 		const int line_;
 		const char* func_;
 };
+
+/**************************/
+/* Error-Result Converter */
+/**************************/
+result_t ErrorToResult( const int error );
 
 /***********************************/
 /* Result-Exception Record Manager */
