@@ -41,8 +41,8 @@ result_t::result_t():
 }
 result_t::result_t( const result_t& result, AUTO_POSITION_IN ):
 	result_( result.result_ ),
-	type_( REPORT_NONE ),
 	logs_( nullptr ),
+	type_( REPORT_NONE ),
 	file_( file ),
 	line_( line ),
 	func_( func )
@@ -50,8 +50,8 @@ result_t::result_t( const result_t& result, AUTO_POSITION_IN ):
 }
 result_t::result_t( const result_code& result, AUTO_POSITION_IN ):
 	result_( &result ),
-	type_( REPORT_NONE ),
 	logs_( nullptr ),
+	type_( REPORT_NONE ),
 	file_( file ),
 	line_( line ),
 	func_( func )
@@ -59,8 +59,8 @@ result_t::result_t( const result_code& result, AUTO_POSITION_IN ):
 }
 result_t::result_t( const result_record& result, AUTO_POSITION_IN ):
 	result_( result.result_ ),
-	type_( result.typeOn_ ),
 	logs_( nullptr ),
+	type_( result.typeOn_ ),
 	file_( file ),
 	line_( line ),
 	func_( func )
@@ -242,13 +242,13 @@ result_record result_code::operator()( const char* msg, AUTO_POSITION_IN ) const
 
 
 result_record::result_record( const result_code& result, const char* msg, AUTO_POSITION_IN ):
-	result_( &result ),
-	typeOn_( REPORT_NONE ),
-	typeOff_( REPORT_NONE ),
 	msg_( nullptr ),
 	file_( file ),
 	line_( line ),
-	func_( func )
+	func_( func ),
+	result_( &result ),
+	typeOn_( REPORT_NONE ),
+	typeOff_( REPORT_NONE )
 {
 	if( msg )
 	{
