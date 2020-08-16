@@ -5,6 +5,8 @@ def GetAutoLibDirList():
     autoLibRoot = os.path.join( os.getcwd(), '..' )
     result = []
     for dir in os.listdir( autoLibRoot ):
+        if not dir.startswith( 'auto_' ):
+            continue
         if dir == 'auto_test':
             continue
         if os.path.isdir( os.path.join( autoLibRoot, dir )):
@@ -54,6 +56,8 @@ if __name__ == '__main__':
 
     if argc == 1:
         print( 'select target auto-lib' )
+        listAutoLib = GetAutoLibDirList()
+        PrintUsage( listAutoLib )
     elif argc == 2:
         targetAutoLib = sys.argv[1]
         listAutoLib = GetAutoLibDirList()
