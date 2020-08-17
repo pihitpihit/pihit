@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include "auto_memory.h"
+#include <auto_memory.h>
+
+using namespace Plastics;
 
 
 class testg
