@@ -6,7 +6,9 @@
 #include <stdlib.h>
 #include <execinfo.h>
 #include <errno.h>
-#include "auto_result.h"
+#include <auto_result.h>
+
+using namespace Plastics;
 
 #define REPORT_NONE			( 0x00000000 )
 #define REPORT_ON_ASSIGN	( 0x00000001 )
@@ -308,7 +310,7 @@ result_record& result_record::byThrow()
 	return *this;
 }
 
-result_t ErrorToResult( const int error )
+result_t Plastics::ErrorToResult( const int error )
 {
 	switch( error )
 	{

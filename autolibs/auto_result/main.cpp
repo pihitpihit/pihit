@@ -1,6 +1,8 @@
 
 #include <iostream>
-#include "auto_result.h"
+#include <auto_result.h>
+
+using namespace Plastics;
 
 void foo()
 {

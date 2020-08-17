@@ -7,18 +7,31 @@ endif()
 
 project( autolibs )
 
+set( AUTO_RESULT       auto_result           )
+set( AUTO_MEMORY       auto_memory           )
+set( AUTO_COMMON       auto_common           )
+
 set( OUTPUT_DIR        output                )
 set( OUTPUT_BIN        ${OUTPUT_DIR}/bin     )
 set( OUTPUT_INC        ${OUTPUT_DIR}/include )
-set( AUTO_RESULT       auto_result           )
-set( AUTO_MEMORY       auto_memory           )
+set( OUTPUT_TEST       ${OUTPUT_DIR}/test    )
+
+# for test binaries
+set( SUB_DIRS
+	#${AUTO_COMMON}
+	${AUTO_RESULT}
+	${AUTO_MEMORY}
+)
 
 set( SRC_FILES
+	${AUTO_COMMON}/auto_thread.cpp
 	${AUTO_RESULT}/auto_result.cpp
 	${AUTO_MEMORY}/auto_memory.cpp
 )
 
 set( INC_FILES
+	${AUTO_COMMON}/auto_tls.hpp
+	${AUTO_COMMON}/auto_thread.h
 	${AUTO_RESULT}/auto_result.h
 	${AUTO_RESULT}/auto_result_list.h
 	${AUTO_RESULT}/auto_result_maker.h
@@ -37,14 +50,16 @@ set(CMAKE_C_FLAGS_RELEASE "-Os -Wall -DNDEBUG -s")
 set(CMAKE_CXX_FLAGS_RELEASE "-Os -Wall -DNDEBUG -s")
 
 include_directories(
+	${AUTO_COMMON}
 	${AUTO_RESULT}
 	${AUTO_MEMORY}
 )
 
 
-file( MAKE_DIRECTORY ${OUTPUT_DIR} )
-file( MAKE_DIRECTORY ${OUTPUT_BIN} )
-file( MAKE_DIRECTORY ${OUTPUT_INC} )
+file( MAKE_DIRECTORY ${OUTPUT_DIR}  )
+file( MAKE_DIRECTORY ${OUTPUT_BIN}  )
+file( MAKE_DIRECTORY ${OUTPUT_INC}  )
+file( MAKE_DIRECTORY ${OUTPUT_TEST} )
 
 add_library( autolibs_shared SHARED ${SRC_FILES} )
 set_target_properties( autolibs_shared PROPERTIES PREFIX "" )
@@ -67,4 +82,11 @@ add_library( autolibs_object_pic OBJECT ${SRC_FILES} )
 set_target_properties( autolibs_object_pic PROPERTIES POSITION_INDEPENDENT_CODE ON )
 set_target_properties( autolibs_object_pic PROPERTIES PREFIX "" )
 set_target_properties( autolibs_object_pic PROPERTIES OUTPUT_NAME ${OUTPUT_BIN}/libauto_obj_pic )
+
+foreach( sub ${SUB_DIRS} )
+	add_executable( test_${sub} ${sub}/main.cpp )
+	set_target_properties( test_${sub} PROPERTIES OUTPUT_NAME ${OUTPUT_TEST}/test_${sub} )
+	add_dependencies( test_${sub} autolibs_static )
+	target_link_libraries( test_${sub} autolibs_static )
+endforeach()
 
