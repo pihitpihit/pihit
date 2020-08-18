@@ -18,13 +18,14 @@ set( OUTPUT_TEST       ${OUTPUT_DIR}/test    )
 
 # for test binaries
 set( SUB_DIRS
-	#${AUTO_COMMON}
+	${AUTO_COMMON}
 	${AUTO_RESULT}
 	${AUTO_MEMORY}
 )
 
 set( SRC_FILES
 	${AUTO_COMMON}/auto_thread.cpp
+	${AUTO_COMMON}/auto_log.cpp
 	${AUTO_RESULT}/auto_result.cpp
 	${AUTO_MEMORY}/auto_memory.cpp
 )
@@ -32,6 +33,7 @@ set( SRC_FILES
 set( INC_FILES
 	${AUTO_COMMON}/auto_tls.hpp
 	${AUTO_COMMON}/auto_thread.h
+	${AUTO_COMMON}/auto_log.h
 	${AUTO_RESULT}/auto_result.h
 	${AUTO_RESULT}/auto_result_list.h
 	${AUTO_RESULT}/auto_result_maker.h
