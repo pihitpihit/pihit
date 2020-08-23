@@ -24,6 +24,7 @@ set( SUB_DIRS
 )
 
 set( SRC_FILES
+	${AUTO_COMMON}/auto_prime.cpp
 	${AUTO_COMMON}/auto_thread.cpp
 	${AUTO_COMMON}/auto_log.cpp
 	${AUTO_COMMON}/auto_time.cpp

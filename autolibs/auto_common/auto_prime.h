@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 namespace Plastics
 {
@@ -18,4 +19,17 @@ namespace Plastics
 	class Private: public Prime
 	{
 	};
+
+	class AutoFinalizer: public Prime
+	{
+	public:
+		AutoFinalizer( std::function<void()> finalizer );
+		~AutoFinalizer();
+	private:
+		std::function<void()> finalizer_;
+	};
 };
+
+#define AutoFinalize( _fin )\
+	Plastics::AutoFinalizer _af_( _fin )
+

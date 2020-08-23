@@ -5,6 +5,8 @@
 
 using namespace Plastics;
 
+AutoFinalize( AutoLog::Finalize );
+
 static const char* gs_logLevelSymbol[] = {
 	"AUTO",
 	"TRACE",
@@ -18,6 +20,7 @@ static const char* gs_logLevelSymbol[] = {
 bool AutoLog::initialized_ = false;
 bool AutoLog::basename_ = true;
 FILE* AutoLog::logFile_ = stdout;
+Lock AutoLog::lock_;
 
 AutoLog::AutoLog( const char* file,
 				  const int line,
@@ -46,8 +49,19 @@ AutoLog::~AutoLog()
 
 result_t AutoLog::Initialize()
 {
-	// TODO: Initialize
-	return Result::Success;
+	CriticalSection cs( AutoLog::lock_ );
+	{
+		// TODO: Initialize
+		return Result::Success;
+	}
+}
+
+void AutoLog::Finalize()
+{
+	CriticalSection cs( AutoLog::lock_ );
+	{
+		// TODO Finalize
+	}
 }
 
 static const char* gs_logPrefixMultiLine = "                    ";
@@ -66,12 +80,6 @@ void AutoLog::Log( LogLevel level, const char* const format, ... )
 	::clock_gettime(CLOCK_REALTIME, &now);
 	localtime_r(&now.tv_sec, &ptm);
 	strftime( timestr, sizeof( timestr ), "%m-%d %T", &ptm );
-
-	fprintf( logFile_,
-			 "[%s.%03ld][%-5s] ",
-			 timestr,
-			 now.tv_nsec / 1000000,
-			 gs_logLevelSymbol[(int)level] );
 
 	// make contents
 	char buf[2048];
@@ -92,38 +100,34 @@ void AutoLog::Log( LogLevel level, const char* const format, ... )
 		line = strtok( nullptr, "\n" );
 	}
 
-	// head line
-	fprintf( logFile_, "%s\n", lines[0] );
-
-	// mid line
-	for( int i = 1; i < (int)lines.size() - 1; i++ )
+	CriticalSection cs( AutoLog::lock_ );
 	{
-		fprintf( logFile_, "%s%-5s %s\n",
-				 gs_logPrefixMultiLine,
-				 gs_logSymbolMidLine,
-				 lines[i] );
-	}
+		fprintf( logFile_,
+				 "[%s.%03ld][%-5s] ",
+				 timestr,
+				 now.tv_nsec / 1000000,
+				 gs_logLevelSymbol[(int)level] );
 
-	// last line
-	if( 2 <= lines.size() )
-	{
-		fprintf( logFile_, "%s%-5s %s\n",
-				 gs_logPrefixMultiLine,
-				 gs_logSymbolLastLine,
-				 lines[lines.size()-1] );
+		// head line
+		fprintf( logFile_, "%s\n", lines[0] );
+
+		// mid line
+		for( int i = 1; i < (int)lines.size() - 1; i++ )
+		{
+			fprintf( logFile_, "%s%-5s %s\n",
+					 gs_logPrefixMultiLine,
+					 gs_logSymbolMidLine,
+					 lines[i] );
+		}
+
+		// last line
+		if( 2 <= lines.size() )
+		{
+			fprintf( logFile_, "%s%-5s %s\n",
+					 gs_logPrefixMultiLine,
+					 gs_logSymbolLastLine,
+					 lines[lines.size()-1] );
+		}
 	}
 }
-
-/*************************
- * AutoLog AutoFinalizer
- *************************/
-class AutoLogGlobal
-{
-	public:
-		~AutoLogGlobal()
-		{
-			// TODO: finalize AutoLog
-		}
-};
-static AutoLogGlobal gs_autoFinalizer;
 

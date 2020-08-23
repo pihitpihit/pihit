@@ -1,6 +1,7 @@
 #pragma once
 
 #include <auto_result.h>
+#include <auto_sync.h>
 
 namespace Plastics
 {
@@ -27,6 +28,7 @@ namespace Plastics
 
 		public:
 			static result_t Initialize();
+			static void Finalize();
 			static void Log( LogLevel level,
 							 const char* const format, ... );
 
@@ -40,6 +42,7 @@ namespace Plastics
 			static bool initialized_;
 			static bool basename_;
 			static FILE* logFile_;
+			static Lock lock_;
 	};
 
 };
