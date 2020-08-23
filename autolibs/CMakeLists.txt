@@ -26,14 +26,19 @@ set( SUB_DIRS
 set( SRC_FILES
 	${AUTO_COMMON}/auto_thread.cpp
 	${AUTO_COMMON}/auto_log.cpp
+	${AUTO_COMMON}/auto_time.cpp
+	${AUTO_COMMON}/auto_sync.cpp
 	${AUTO_RESULT}/auto_result.cpp
 	${AUTO_MEMORY}/auto_memory.cpp
 )
 
 set( INC_FILES
+	${AUTO_COMMON}/auto_prime.h
 	${AUTO_COMMON}/auto_tls.hpp
 	${AUTO_COMMON}/auto_thread.h
 	${AUTO_COMMON}/auto_log.h
+	${AUTO_COMMON}/auto_time.h
+	${AUTO_COMMON}/auto_sync.h
 	${AUTO_RESULT}/auto_result.h
 	${AUTO_RESULT}/auto_result_list.h
 	${AUTO_RESULT}/auto_result_maker.h
