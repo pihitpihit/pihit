@@ -3,16 +3,29 @@
 
 #include <exception>
 #include <vector>
+#ifdef  PLS_OS_WIN
+#	include <windows.h>
+#else //PLS_OS_WIN
+#endif//PLS_OS_WIN
+#include <auto_windows.h>
+#include <auto_util.h>
 
 #define AUTO_POSITION_IN    \
 	const char* file,       \
 	const int   line,       \
 	const char* func
 
+#ifdef  PLS_OS_WIN
+#define AUTO_POSITION                       \
+	const char* file = nullptr,    			\
+	const int   line = 0,    				\
+	const char* func = nullptr
+#else //PLS_OS_WIN
 #define AUTO_POSITION                       \
 	const char* file = __builtin_FILE(),    \
 	const int   line = __builtin_LINE(),    \
 	const char* func = __builtin_FUNCTION()
+#endif//PLS_OS_WIN
 
 #define AUTO_POSITION_PASS	file, line, func
 
@@ -66,7 +79,13 @@ namespace Plastics
 			result_t( const result_t& result, AUTO_POSITION );
 			result_t( const result_code& result, AUTO_POSITION );
 			result_t( const result_record& result, AUTO_POSITION );
+#ifdef  PLS_OS_WIN
+			result_t( const DWORD error );
+			result_t( const NTSTATUS error );
+			result_t( const errno_t error );
+#else //PLS_OS_WIN
 			result_t( const int error );
+#endif//PLS_OS_WIN
 			~result_t();
 		public:
 			uint32_t id() const;
@@ -96,6 +115,11 @@ namespace Plastics
 	/**************************/
 	/* Error-Result Converter */
 	/**************************/
+#ifdef  PLS_OS_WIN
+	result_t Win32ErrorToResult( const DWORD error );
+	result_t NtStatusToResult( const NTSTATUS error );
+	result_t ErrorToResult( const errno_t error );
+#endif//PLS_OS_WIN
 	result_t ErrorToResult( const int error );
 
 	/***********************************/
@@ -136,8 +160,6 @@ namespace Plastics
 /* Result-Exception Hybrid Class Auto Generator */
 /************************************************/
 #define ResultClassMakerBase( _name, _desc )\
-	constexpr char _name##__name[] = #_name;\
-	constexpr char _name##__desc[] = _desc;\
 	class _name##_t: public result_code\
 	{\
 	public:\
@@ -147,8 +169,8 @@ namespace Plastics
 		constexpr uint32_t id() const { return (uint32_t)ResultCode::_name; }\
 		constexpr operator int() const { return (uint32_t)ResultCode::_name; }\
 		uint32_t getId() const override { return id(); }\
-		const char* getName() const override { return _name##__name; }\
-		const char* getDesc() const override { return _name##__desc; }\
+		const char* getName() const override { return #_name; }\
+		const char* getDesc() const override { return _desc; }\
 	};\
 	const _name##_t _name;
 
@@ -159,12 +181,6 @@ namespace Plastics
 	ResultClassMakerBase( _name, #_name )
 #define ResultClassMaker2( _name, _desc )\
 	ResultClassMakerBase( _name, _desc )
-#define KiMacroGetArg1( _arg1, ... )\
-	_arg1
-#define KiMacroGetArg3( _arg1, _arg2, _arg3, ... )\
-	_arg3
-#define ResultClassMaker( ... )\
-	KiMacroGetArg3( __VA_ARGS__, ResultClassMaker2, ResultClassMaker1 )( __VA_ARGS__ )
 
 #endif//__ResultMaker_Base__
 
@@ -172,28 +188,32 @@ namespace Plastics
 /* Result Code-Class-Exception Auto Generator */
 /**********************************************/
 #undef ResultMakerStart
-#undef ResultMaker
+#undef ResultMakerN_
+#undef ResultMakerND
 #undef ResultMakerEnd
 
 #if defined(__ResultMaker_Enumeration__)
 #	ifndef __ResultMaker_Enumeration_Done__
 #	define __ResultMaker_Enumeration_Done__
 #		define ResultMakerStart()       namespace Plastics { enum class ResultCode {
-#		define ResultMaker( ... )           KiMacroGetArg1( __VA_ARGS__ ),
+#		define ResultMakerN_( _name )        	_name,
+#		define ResultMakerND( _name, _desc ) 	_name,
 #		define ResultMakerEnd()         }; };
 #	endif//__ResultMaker_Enumeration_Done__
 #elif defined(__ResultMaker_Class__)
 #	ifndef __ResultMaker_Class_Done__
 #	define __ResultMaker_Class_Done__
 #		define ResultMakerStart()       namespace Plastics { namespace Result {
-#		define ResultMaker( ... )           ResultClassMaker( __VA_ARGS__ )
+#		define ResultMakerN_( _name )        	ResultClassMaker1( _name )
+#		define ResultMakerND( _name, _desc ) 	ResultClassMaker2( _name, _desc )
 #		define ResultMakerEnd()         }; };
 #	endif//__ResultMaker_Class_Done__
 #else
 #	ifndef __ResultMaker_Dummy__
 #	define __ResultMaker_Dummy__
 #		define ResultMakerStart()
-#		define ResultMaker( ... )
+#		define ResultMakerN_( _name )
+#		define ResultMakerND( _name, _desc )
 #		define ResultMakerEnd()
 #	endif//__ResultMaker_Dummy__
 #endif

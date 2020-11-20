@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.16.3 )
+cmake_minimum_required( VERSION 3.10.0 )
 
 find_program( CCACHE_PROGRAM ccache )
 if( CCACHE_PROGRAM )
@@ -15,6 +15,15 @@ set( OUTPUT_DIR        output                )
 set( OUTPUT_BIN        ${OUTPUT_DIR}/bin     )
 set( OUTPUT_INC        ${OUTPUT_DIR}/include )
 set( OUTPUT_TEST       ${OUTPUT_DIR}/test    )
+
+file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_BIN}  OUTPUT_BIN  )
+file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_INC}  OUTPUT_INC  )
+file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_TEST} OUTPUT_TEST )
+
+set( CMAKE_BINARY_DIR ${OUTPUT_BIN} )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 
 # for test binaries
 set( SUB_DIRS
@@ -46,23 +55,27 @@ set( INC_FILES
 	${AUTO_MEMORY}/auto_memory.h
 )
 
+if( WIN32 )
+	set( PLS_COPY copy /Y )
+	set( FLAGS_G3 /EHsc )
+	add_definitions( -DPLS_OS_WIN )
+else()
+	set( PLS_COPY cp )
+	set( FLAGS_G3 -g3 )
+endif()
+
 set( CMAKE_CXX_STANDARD 14 )
 
 set(CMAKE_C_FLAGS "-Os -Wall")
 set(CMAKE_CXX_FLAGS "-Os -Wall")
 
-set(CMAKE_C_FLAGS_DEBUG "-Os -Wall -g3")
-set(CMAKE_CXX_FLAGS_DEBUG  "-Os -Wall -g3")
+set(CMAKE_C_FLAGS_DEBUG "-Os -Wall ${FLAGS_G3}")
+set(CMAKE_CXX_FLAGS_DEBUG  "-Os -Wall ${FLAGS_G3}")
 
 set(CMAKE_C_FLAGS_RELEASE "-Os -Wall -DNDEBUG -s")
 set(CMAKE_CXX_FLAGS_RELEASE "-Os -Wall -DNDEBUG -s")
 
-include_directories(
-	${AUTO_COMMON}
-	${AUTO_RESULT}
-	${AUTO_MEMORY}
-)
-
+include_directories( ${SUB_DIRS} )
 
 file( MAKE_DIRECTORY ${OUTPUT_DIR}  )
 file( MAKE_DIRECTORY ${OUTPUT_BIN}  )
@@ -71,30 +84,33 @@ file( MAKE_DIRECTORY ${OUTPUT_TEST} )
 
 add_library( autolibs_shared SHARED ${SRC_FILES} )
 set_target_properties( autolibs_shared PROPERTIES PREFIX "" )
-set_target_properties( autolibs_shared PROPERTIES OUTPUT_NAME ${OUTPUT_BIN}/libauto )
-
-foreach( header ${INC_FILES} )
-	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND echo cp ${header} ${OUTPUT_INC} )
-	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND cp ${header} ${OUTPUT_INC} )
-endforeach()
+set_target_properties( autolibs_shared PROPERTIES OUTPUT_NAME libauto )
 
 add_library( autolibs_static STATIC ${SRC_FILES} )
 set_target_properties( autolibs_static PROPERTIES PREFIX "" )
-set_target_properties( autolibs_static PROPERTIES OUTPUT_NAME ${OUTPUT_BIN}/libauto )
+set_target_properties( autolibs_static PROPERTIES OUTPUT_NAME libauto_static )
 
 add_library( autolibs_object OBJECT ${SRC_FILES} )
 set_target_properties( autolibs_object PROPERTIES PREFIX "" )
-set_target_properties( autolibs_object PROPERTIES OUTPUT_NAME ${OUTPUT_BIN}/libauto_obj )
+set_target_properties( autolibs_object PROPERTIES OUTPUT_NAME libauto_obj )
 
 add_library( autolibs_object_pic OBJECT ${SRC_FILES} )
 set_target_properties( autolibs_object_pic PROPERTIES POSITION_INDEPENDENT_CODE ON )
 set_target_properties( autolibs_object_pic PROPERTIES PREFIX "" )
-set_target_properties( autolibs_object_pic PROPERTIES OUTPUT_NAME ${OUTPUT_BIN}/libauto_obj_pic )
+set_target_properties( autolibs_object_pic PROPERTIES OUTPUT_NAME libauto_obj_pic )
+
+foreach( header ${INC_FILES} )
+	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${header} header )
+	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND cd )
+	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND if not exist "${OUTPUT_INC}" mkdir "${OUTPUT_INC}" )
+	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND echo ${PLS_COPY} ${header} ${OUTPUT_INC} )
+	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND ${PLS_COPY} ${header} ${OUTPUT_INC} )
+endforeach()
 
 foreach( sub ${SUB_DIRS} )
 	add_executable( test_${sub} ${sub}/main.cpp )
-	set_target_properties( test_${sub} PROPERTIES OUTPUT_NAME ${OUTPUT_TEST}/test_${sub} )
+	set_target_properties( test_${sub} PROPERTIES OUTPUT_NAME test_${sub} )
 	add_dependencies( test_${sub} autolibs_static )
-	target_link_libraries( test_${sub} autolibs_static )
+	target_link_libraries( test_${sub} PUBLIC autolibs_static )
 endforeach()
 

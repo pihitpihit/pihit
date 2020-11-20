@@ -2,6 +2,7 @@
 #include <string.h>
 #include <auto_log.h>
 #include <auto_util.h>
+#include <auto_time.h>
 
 using namespace Plastics;
 
@@ -36,7 +37,7 @@ AutoLog::AutoLog( const char* file,
 	}
 
 	const char* name = ( AutoLog::basename_ ? base_ : file_ );
-	AutoLog::Log( LogLevel::AUTO, "%s(%d):%s -> Enter", name, line_, func_ );
+	AutoLog::Log( LogLevel::Auto, "%s(%d):%s -> Enter", name, line_, func_ );
 }
 
 AutoLog::~AutoLog()
@@ -44,7 +45,7 @@ AutoLog::~AutoLog()
 	const char* name = ( AutoLog::basename_ ? base_ : file_ );
 	char liner[8] = "-------";
 	liner[ Util::Log( 10, line_ ) ] = '\0';
-	AutoLog::Log( LogLevel::AUTO, "%s(%s):%s -> Leave", name, liner, func_ );
+	AutoLog::Log( LogLevel::Auto, "%s(%s):%s -> Leave", name, liner, func_ );
 }
 
 result_t AutoLog::Initialize()
@@ -73,12 +74,12 @@ void AutoLog::Log( LogLevel level, const char* const format, ... )
 	// TODO: make thread safe
 
 	// timestamp
-	struct tm ptm;
-	struct timespec now;
+	Tm ptm;
+	TimeSpec now;
 	char timestr[100];
 
-	::clock_gettime(CLOCK_REALTIME, &now);
-	localtime_r(&now.tv_sec, &ptm);
+	TimeSpec::ClockGetTime( TimeSpec::ClockId::RealTime, &now );
+	Tm::LocalTime( &now.tv_sec, &ptm );
 	strftime( timestr, sizeof( timestr ), "%m-%d %T", &ptm );
 
 	// make contents
@@ -112,12 +113,9 @@ void AutoLog::Log( LogLevel level, const char* const format, ... )
 		fprintf( logFile_, "%s\n", lines[0] );
 
 		// mid line
-		for( int i = 1; i < (int)lines.size() - 1; i++ )
+		for( size_t i = 1; i < lines.size() - 1; i++ )
 		{
-			fprintf( logFile_, "%s%-5s %s\n",
-					 gs_logPrefixMultiLine,
-					 gs_logSymbolMidLine,
-					 lines[i] );
+			fprintf( logFile_, "%s%-5s %s\n", gs_logPrefixMultiLine, gs_logSymbolMidLine, lines[i] );
 		}
 
 		// last line

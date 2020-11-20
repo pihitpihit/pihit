@@ -1,17 +1,17 @@
 #include <errno.h>
 #include "Lock.h"
 
-Lock::Lock()
+Lock2::Lock()
 {
 	pthread_mutex_init( &lock_, NULL );
 }
 
-Lock::~Lock()
+Lock2::~Lock()
 {
 	pthread_mutex_destroy( &lock_ );
 }
 
-void Lock::Enter()
+void Lock2::Enter()
 {
 	if( pthread_mutex_lock( &lock_ ) != 0 )
 	{
@@ -19,7 +19,7 @@ void Lock::Enter()
 	}
 }
 
-void Lock::Leave()
+void Lock2::Leave()
 {
 	if( pthread_mutex_unlock( &lock_ ) == EINVAL )
 	{
@@ -27,20 +27,20 @@ void Lock::Leave()
 	}
 }
 
-Condition::Condition():
+Condition2::Condition():
 	clockid_( CLOCK_REALTIME )
 {
 	pthread_condattr_init( &attr_ );
 	pthread_cond_init( &cond_, &attr_ );
 }
 
-Condition::~Condition()
+Condition2::~Condition()
 {
 	pthread_cond_destroy( &cond_ );
 	pthread_condattr_destroy( &attr_ );
 }
 
-result_t Condition::Wait( int nTimeoutMs )
+result_t Condition2::Wait( int nTimeoutMs )
 {
 	int error;
 
@@ -57,7 +57,7 @@ result_t Condition::Wait( int nTimeoutMs )
 	return result_t( error );
 }
 
-void Condition::Wakeup( int bBroadcast )
+void Condition2::Wakeup( int bBroadcast )
 {
 	if( bBroadcast )
 	{
@@ -69,13 +69,13 @@ void Condition::Wakeup( int bBroadcast )
 	}
 }
 
-CriticalSection::CriticalSection( Lock& lock ):
+CriticalSection2::CriticalSection( Lock& lock ):
 	lock_( lock )
 {
 	lock_.Enter();
 }
 
-CriticalSection::~CriticalSection()
+CriticalSection2::~CriticalSection()
 {
 	lock_.Leave();
 }

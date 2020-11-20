@@ -1,5 +1,7 @@
 #pragma once
 
+#include <auto_windows.h>
+
 namespace Plastics
 {
 	namespace Util

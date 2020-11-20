@@ -1,10 +1,10 @@
 #include <auto_result_maker.h>
 
 ResultMakerStart()
-ResultMaker( Success )
-ResultMaker( Internal )
-ResultMaker( InvalidParameter, "Invalid Parameter is passed." )
-ResultMaker( MemoryAllocFail )
-ResultMaker( Timeout )
+ResultMakerN_( Success )
+ResultMakerN_( Internal )
+ResultMakerND( InvalidParameter, "Invalid Parameter is passed." )
+ResultMakerN_( MemoryAllocFail )
+ResultMakerN_( Timeout )
 ResultMakerEnd()
 

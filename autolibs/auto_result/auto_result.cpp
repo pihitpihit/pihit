@@ -1,10 +1,12 @@
 
 #include <cassert>
-#include <cxxabi.h>
-#include <unistd.h>
+#ifndef PLS_OS_WIN
+#	include <cxxabi.h>
+#	include <unistd.h>
+#	include <execinfo.h>
+#endif//PLS_OS_WIN
 #include <stdio.h>
 #include <stdlib.h>
-#include <execinfo.h>
 #include <errno.h>
 #include <auto_result.h>
 
@@ -33,9 +35,14 @@ const char* exception_t::what() const noexcept
 
 char* demangle( const char* mangledName )
 {
+#ifdef  PLS_OS_WIN
+	(void)mangledName;
+	return "(TODO:Implement)";
+#else //PLS_OS_WIN
 	size_t len;
 	int status;
 	return abi::__cxa_demangle( mangledName, NULL, &len, &status );
+#endif//PLS_OS_WIN
 }
 result_t::result_t():
 	line_( 0 )
@@ -72,10 +79,26 @@ result_t::result_t( const result_record& result, AUTO_POSITION_IN ):
 		initLog();
 	}
 }
+#ifdef  PLS_OS_WIN
+result_t::result_t( const DWORD error ):
+	result_t( Win32ErrorToResult( error ) )
+{
+}
+result_t::result_t( const NTSTATUS error ):
+	result_t( NtStatusToResult( error ) )
+{
+}
+result_t::result_t( const errno_t error ):
+	result_t( ErrorToResult( error ) )
+{
+}
+#else //PLS_OS_WIN
 result_t::result_t( const int error ):
 	result_t( ErrorToResult( error ) )
 {
 }
+#endif//PLS_OS_WIN
+
 result_t::~result_t()
 {
 	if( isType( REPORT_ON_FINAL ) )
@@ -84,7 +107,7 @@ result_t::~result_t()
 		printf( "[----] Declared at %s(%d):%s()\n", file_, line_, func_ );
 		if( logs_->size() )
 		{
-			printf( "[----] There were %lu errors.\n", logs_->size() );
+			printf( "[----] There were %zu errors.\n", logs_->size() );
 			int idx = 0;
 			for( auto r : *logs_ )
 			{
@@ -106,10 +129,16 @@ result_t::~result_t()
 	}
 	if( isType( REPORT_ON_FINAL|REPORT_BY_THROW ) )
 	{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wexceptions"
+#ifdef  PLS_OS_WIN
+#	pragma warning( disable : 4297 )
 		throw *this;
-#pragma GCC diagnostic pop
+#	pragma warning( default : 4297 )
+#else //PLS_OS_WIN
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wexceptions"
+		throw *this;
+#	pragma GCC diagnostic pop
+#endif//PLS_OS_WIN
 	}
 }
 uint32_t result_t::id() const
@@ -118,7 +147,7 @@ uint32_t result_t::id() const
 }
 result_t::operator int() const
 {
-	return result_->getId();
+	return (int)result_->getId();
 }
 result_t& result_t::operator=( const result_t& result )
 {
@@ -178,16 +207,25 @@ void result_t::backtrace( AUTO_POSITION_IN )
 {
 	void* array[10];
 	size_t size;
+	char** frames;
 
+#ifdef  PLS_OS_WIN
+	(void)file;
+	(void)line;
+	(void)func;
+	size = 0;
+	frames = nullptr;
+#else //PLS_OS_WIN
 	size = ::backtrace( array, 10 );
 	printf( "backtrack returns size(%d)\n", (int)size );
 
 	//backtrace_symbols_fd( &array[1], size - 1, STDERR_FILENO );
 	//backtrace_symbols_fd( array, size, STDERR_FILENO );
-	char** frames = backtrace_symbols( array, size );
+	frames = backtrace_symbols( array, size );
+#endif//PLS_OS_WIN
 
 	printf( "++++++++++++++++++++++++++++++\n" );
-	for( int i = 0; i < size; i++ )
+	for( size_t i = 0; i < size; i++ )
 	{
 		printf( "%s\n", frames[i] );
 	}
@@ -310,7 +348,30 @@ result_record& result_record::byThrow()
 	return *this;
 }
 
+#ifdef  PLS_OS_WIN
+result_t Plastics::Win32ErrorToResult( const DWORD error )
+{
+	switch( error )
+	{
+	default:
+		return Result::Internal;
+	}
+}
+result_t Plastics::NtStatusToResult( const NTSTATUS error )
+{
+	switch( error )
+	{
+	default:
+		return Result::Internal;
+	}
+}
+#endif//PLS_OS_WIN
+
+#ifdef  PLS_OS_WIN
+result_t Plastics::ErrorToResult( const errno_t error )
+#else //PLS_OS_WIN
 result_t Plastics::ErrorToResult( const int error )
+#endif//PLS_OS_WIN
 {
 	switch( error )
 	{

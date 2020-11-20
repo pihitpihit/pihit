@@ -12,7 +12,7 @@ int main()
 {
 	AutoLog::Initialize();
 
-	for( int level = 0; level < (int)LogLevel::COUNT; level++ )
+	for( int level = 0; level < (int)LogLevel::Count; level++ )
 	{
 		AutoLog::Log( (LogLevel)level, "aa\na\n%s", "bbb" );
 	}

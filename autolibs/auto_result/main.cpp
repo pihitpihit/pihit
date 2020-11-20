@@ -8,7 +8,7 @@ void foo()
 {
 	result_t result = Result::Internal;
 	throw result;
-	throw Result::MemoryAllocFail;
+	//throw Result::MemoryAllocFail;
 }
 
 int main( void )

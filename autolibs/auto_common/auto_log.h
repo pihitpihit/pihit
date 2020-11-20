@@ -7,15 +7,15 @@ namespace Plastics
 {
 	enum class LogLevel : int
 	{
-		AUTO,
-		TRACE,
-		DEBUG,
-		INFO,
-		WARN,
-		ERROR,
-		CRIT,
+		Auto,
+		Trace,
+		Debug,
+		Info,
+		Warn,
+		Error,
+		Crit,
 		/* TODO: add here. */
-		COUNT
+		Count
 	};
 
 	class AutoLog

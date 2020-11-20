@@ -5,11 +5,11 @@
 #include "../autolibs/auto_result/auto_result.h"
 #include "Primitive.h"
 
-class Lock: public PrimeNoncopy
+class Lock2: public PrimeNoncopy
 {
 	public:
-		Lock();
-		~Lock();
+		Lock2();
+		~Lock2();
 
 	public:
 		void Enter();
@@ -19,13 +19,13 @@ class Lock: public PrimeNoncopy
 		pthread_mutex_t lock_;
 };
 
-class Condition: public Lock
+class Condition2: public Lock2
 {
 	public:
 		static const int INFINITE = -1;
 	public:
-		Condition();
-		~Condition();
+		Condition2();
+		~Condition2();
 
 	public:
 		result_t Wait( int nTimeoutMs = Condition::INFINITE );
@@ -37,12 +37,12 @@ class Condition: public Lock
 		pthread_condattr_t attr_;
 };
 
-class CriticalSection: public PrimeNoncopy
+class CriticalSection2: public PrimeNoncopy
 {
 	public:
-		CriticalSection() = delete;
-		CriticalSection( Lock& lock );
-		~CriticalSection();
+		CriticalSection2() = delete;
+		CriticalSection2( Lock& lock );
+		~CriticalSection2();
 
 	private:
 		Lock& lock_;
