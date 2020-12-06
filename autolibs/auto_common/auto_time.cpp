@@ -65,7 +65,6 @@ int TimeSpec::ClockGetTime( ClockId id, TimeSpec* tp )
 		case ClockId::Monotonic:			id2 = CLOCK_MONOTONIC;			break;
 		case ClockId::ProcessCpuTimeId:		id2 = CLOCK_PROCESS_CPUTIME_ID;	break;
 		case ClockId::ThreadCpuTimeId:		id2 = CLOCK_THREAD_CPUTIME_ID;	break;
-		case ClockId::RealTimeCoarse:		id2 = CLOCK_READTIME_COARSE;	break;
 	}
 	return clock_gettime( id2, tp );
 #endif//PLS_OS_WIN
