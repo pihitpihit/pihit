@@ -1,6 +1,7 @@
 #ifndef __ResultMaker_Base__
 #define __ResultMaker_Base__
 
+#include <stdint.h>
 #include <exception>
 #include <vector>
 #ifdef  PLS_OS_WIN
