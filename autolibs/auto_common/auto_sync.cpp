@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <assert.h>
 #include <auto_sync.h>
 #include <auto_time.h>
 using namespace Plastics;

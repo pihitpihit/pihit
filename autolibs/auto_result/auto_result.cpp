@@ -5,6 +5,7 @@
 #	include <unistd.h>
 #	include <execinfo.h>
 #endif//PLS_OS_WIN
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
