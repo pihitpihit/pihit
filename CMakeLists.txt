@@ -19,20 +19,13 @@ add_custom_target( Plastics ALL
 )
 
 foreach( module ${SUB_MODULES} )
-	add_dependencies( Plastics ${module}_shared ${module}_static ${module}_object ${module}_object_pic )
+	add_dependencies( Plastics ${module}_shared ${module}_static )
 endforeach()
 
-if( WIN32 )
-	set( PLS_COPY xcopy /E /Y )
-else()
-	set( PLS_COPY cp -r )
-endif()
-
 foreach( module ${SUB_MODULES} )
-	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${module}/${OUTPUT_DIR}/* module_output_dir )
+	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${module}/${OUTPUT_DIR} module_output_dir )
 	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_DIR} output_dir )
-	add_custom_command( TARGET Plastics POST_BUILD COMMAND echo ${PLS_COPY} ${module_output_dir} ${output_dir} )
-	add_custom_command( TARGET Plastics POST_BUILD COMMAND ${PLS_COPY} ${module_output_dir} ${output_dir} )
+	add_custom_command( TARGET Plastics POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${module_output_dir} ${output_dir} )
 endforeach()
 
 

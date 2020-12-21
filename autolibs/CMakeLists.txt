@@ -56,12 +56,7 @@ set( INC_FILES
 )
 
 if( WIN32 )
-	set( PLS_COPY copy /Y )
-	set( FLAGS_G3 /EHsc )
 	add_definitions( -DPLS_OS_WIN )
-else()
-	set( PLS_COPY cp )
-	set( FLAGS_G3 -g3 )
 endif()
 
 set( CMAKE_CXX_STANDARD 14 )
@@ -82,35 +77,29 @@ file( MAKE_DIRECTORY ${OUTPUT_BIN}  )
 file( MAKE_DIRECTORY ${OUTPUT_INC}  )
 file( MAKE_DIRECTORY ${OUTPUT_TEST} )
 
-add_library( autolibs_shared SHARED ${SRC_FILES} )
-set_target_properties( autolibs_shared PROPERTIES PREFIX "" )
+add_library( autolibs_shared SHARED $<TARGET_OBJECTS:autolibs_object> )
 set_target_properties( autolibs_shared PROPERTIES OUTPUT_NAME libauto )
 
-add_library( autolibs_static STATIC ${SRC_FILES} )
-set_target_properties( autolibs_static PROPERTIES PREFIX "" )
+add_library( autolibs_static STATIC $<TARGET_OBJECTS:autolibs_object> )
 set_target_properties( autolibs_static PROPERTIES OUTPUT_NAME libauto_static )
 
 add_library( autolibs_object OBJECT ${SRC_FILES} )
-set_target_properties( autolibs_object PROPERTIES PREFIX "" )
+set_target_properties( autolibs_object PROPERTIES POSITION_INDEPENDENT_CODE ON )
 set_target_properties( autolibs_object PROPERTIES OUTPUT_NAME libauto_obj )
-
-add_library( autolibs_object_pic OBJECT ${SRC_FILES} )
-set_target_properties( autolibs_object_pic PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( autolibs_object_pic PROPERTIES PREFIX "" )
-set_target_properties( autolibs_object_pic PROPERTIES OUTPUT_NAME libauto_obj_pic )
 
 foreach( header ${INC_FILES} )
 	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${header} header )
-	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND cd )
-	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND if not exist "${OUTPUT_INC}" mkdir "${OUTPUT_INC}" )
-	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND echo ${PLS_COPY} ${header} ${OUTPUT_INC} )
-	add_custom_command( TARGET autolibs_shared POST_BUILD COMMAND ${PLS_COPY} ${header} ${OUTPUT_INC} )
+	add_custom_command( TARGET autolibs_shared POST_BUILD
+		COMMAND cd
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_INC}
+		COMMAND ${CMAKE_COMMAND} -E copy ${header} ${OUTPUT_INC} )
 endforeach()
 
 foreach( sub ${SUB_DIRS} )
 	add_executable( test_${sub} ${sub}/main.cpp )
-	set_target_properties( test_${sub} PROPERTIES OUTPUT_NAME test_${sub} )
-	add_dependencies( test_${sub} autolibs_static )
-	target_link_libraries( test_${sub} PUBLIC autolibs_static )
+	set_target_properties( test_${sub}
+		PROPERTIES OUTPUT_NAME test_${sub}
+		RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_TEST} )
+	target_link_libraries( test_${sub} PRIVATE autolibs_static )
 endforeach()
 

@@ -14,7 +14,7 @@ namespace Plastics
 				Monotonic				,
 				ProcessCpuTimeId		,
 				ThreadCpuTimeId			,
-				RealTimeCoarse			,
+				//RealTimeCoarse			,
 			};
 
 		public:

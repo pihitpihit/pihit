@@ -5,6 +5,8 @@
 #else //PLS_OS_WIN
 #	include <thread>
 #endif//PLS_OS_WIN
+#include <auto_result.h>
+#include <auto_sync.h>
 
 namespace Plastics
 {
@@ -19,7 +21,28 @@ namespace Plastics
 	class AutoThread
 	{
 		public:
+			AutoThread();
+			~AutoThread();
+
+		public:
+			result_t AddTask();
+			result_t Run();
+			result_t Join();
+			result_t Detach();
+			result_t Kill();
+			result_t Pause();
+			result_t Resume();
+			result_t Cancel();
+
+		public:
 			static ThreadId GetTid();
+
+		private:
+
+
+		private:
+			std::thread* thread_;
+			Condition cond_;
 	};
 };
 
