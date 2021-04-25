@@ -1,5 +1,15 @@
 cmake_minimum_required( VERSION 3.10.0 )
 
+#
+# chech current working directory
+#
+if( CMAKE_BINARY_DIR STREQUAL CMAKE_CURRENT_LIST_DIR )
+	message( FATAL_ERROR "DO NOT build in src directory.\n"
+						 "You can build by following steps:\n"
+						 "\tPROMPT> cd ../build\n"
+						 "\tPROMPT> make" )
+endif()
+
 project( Plastics )
 
 set( OUTPUT_DIR output )
