@@ -1,7 +1,11 @@
 
 all: list
 
-platform:
+clean:
+	rm -rf cmakes
+	rm -rf ../src/output
+
+plastics:
 	rm -rf ../src/CMakefiles ../src/CMakeCache.txt
 	mkdir -p cmakes
 	cd cmakes; cmake ../../src

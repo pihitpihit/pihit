@@ -1,11 +1,3 @@
 
 /build/cmakes
 /output
-/src/output
-/src/autolibs/output
-test
-Info.plist
-*.a
-*.dylib
-autolibs/output
-.vs/
