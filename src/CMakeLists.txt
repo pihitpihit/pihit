@@ -12,13 +12,14 @@ endif()
 
 project( Plastics )
 
-set( OUTPUT_DIR output )
+set( PLASTICS_OUTPUT_DIRECTORY_BASE ${CMAKE_CURRENT_LIST_DIR}/../output )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PLASTICS_OUTPUT_DIRECTORY_BASE}/bin )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PLASTICS_OUTPUT_DIRECTORY_BASE}/bin )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PLASTICS_OUTPUT_DIRECTORY_BASE}/bin )
 
 set( SUB_MODULES
 	autolibs
 )
-
-file( MAKE_DIRECTORY ${OUTPUT_DIR} )
 
 foreach( module ${SUB_MODULES} )
 	add_subdirectory( ${module} )
@@ -31,11 +32,4 @@ add_custom_target( Plastics ALL
 foreach( module ${SUB_MODULES} )
 	add_dependencies( Plastics ${module}_shared ${module}_static )
 endforeach()
-
-foreach( module ${SUB_MODULES} )
-	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${module}/${OUTPUT_DIR} module_output_dir )
-	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_DIR} output_dir )
-	add_custom_command( TARGET Plastics POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${module_output_dir} ${output_dir} )
-endforeach()
-
 

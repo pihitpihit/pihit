@@ -11,19 +11,8 @@ set( AUTO_RESULT       result                )
 set( AUTO_MEMORY       memory                )
 set( AUTO_COMMON       common                )
 
-set( OUTPUT_DIR        output                )
-set( OUTPUT_BIN        ${OUTPUT_DIR}/bin     )
-set( OUTPUT_INC        ${OUTPUT_DIR}/include )
-set( OUTPUT_TEST       ${OUTPUT_DIR}/test    )
-
-file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_BIN}  OUTPUT_BIN  )
-file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_INC}  OUTPUT_INC  )
-file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${OUTPUT_TEST} OUTPUT_TEST )
-
-set( CMAKE_BINARY_DIR ${OUTPUT_BIN} )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
+file( TO_NATIVE_PATH ${PLASTICS_OUTPUT_DIRECTORY_BASE}/include  OUTPUT_INC  )
+file( TO_NATIVE_PATH ${PLASTICS_OUTPUT_DIRECTORY_BASE}/test     OUTPUT_TEST )
 
 # for test binaries
 set( SUB_DIRS
@@ -72,8 +61,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "-Os -Wall -DNDEBUG -s")
 
 include_directories( ${SUB_DIRS} )
 
-file( MAKE_DIRECTORY ${OUTPUT_DIR}  )
-file( MAKE_DIRECTORY ${OUTPUT_BIN}  )
 file( MAKE_DIRECTORY ${OUTPUT_INC}  )
 file( MAKE_DIRECTORY ${OUTPUT_TEST} )
 
