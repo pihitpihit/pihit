@@ -7,9 +7,9 @@ endif()
 
 project( autolibs )
 
-set( AUTO_RESULT       auto_result           )
-set( AUTO_MEMORY       auto_memory           )
-set( AUTO_COMMON       auto_common           )
+set( AUTO_RESULT       result                )
+set( AUTO_MEMORY       memory                )
+set( AUTO_COMMON       common                )
 
 set( OUTPUT_DIR        output                )
 set( OUTPUT_BIN        ${OUTPUT_DIR}/bin     )
@@ -78,14 +78,14 @@ file( MAKE_DIRECTORY ${OUTPUT_INC}  )
 file( MAKE_DIRECTORY ${OUTPUT_TEST} )
 
 add_library( autolibs_shared SHARED $<TARGET_OBJECTS:autolibs_object> )
-set_target_properties( autolibs_shared PROPERTIES OUTPUT_NAME libauto )
+set_target_properties( autolibs_shared PROPERTIES OUTPUT_NAME auto )
 
 add_library( autolibs_static STATIC $<TARGET_OBJECTS:autolibs_object> )
-set_target_properties( autolibs_static PROPERTIES OUTPUT_NAME libauto_static )
+set_target_properties( autolibs_static PROPERTIES OUTPUT_NAME auto_static )
 
 add_library( autolibs_object OBJECT ${SRC_FILES} )
 set_target_properties( autolibs_object PROPERTIES POSITION_INDEPENDENT_CODE ON )
-set_target_properties( autolibs_object PROPERTIES OUTPUT_NAME libauto_obj )
+set_target_properties( autolibs_object PROPERTIES OUTPUT_NAME auto_obj )
 
 foreach( header ${INC_FILES} )
 	file( TO_NATIVE_PATH ${CMAKE_CURRENT_LIST_DIR}/${header} header )
