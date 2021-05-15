@@ -13,6 +13,7 @@ enum class SudokuCellType
 	AutoCol,
 	AutoLev,
 	AutoSec,
+	AutoGss,
 	Manual,
 	Working,
 };
@@ -29,6 +30,7 @@ public:
 		case SudokuCellType::AutoCol: return "AutoCol";
 		case SudokuCellType::AutoLev: return "AutoLev";
 		case SudokuCellType::AutoSec: return "AutoSec";
+		case SudokuCellType::AutoGss: return "AutoGss";
 		case SudokuCellType::Manual : return " Manual";
 		case SudokuCellType::Working: return "Working";
 		default: throw "Invalid Cell Type.";
@@ -70,8 +72,6 @@ private:
 	int toDigit(const char ch);
 
 private:
-	bool valid();
-	bool zeroScore();
 	void updateScore();
 	void updateScore(int i, int j);
 
@@ -86,7 +86,7 @@ private:
 
 
 private:
-	const int boardSize_;
+	int boardSize_;
 	int board_[9][9];
 	int score_[9][9];
 	int map_[9+1][9][9];
@@ -347,10 +347,14 @@ bool Sudoku::validPut(int row, int col, int val)
 {
 	Sudoku* dup = new Sudoku(*this);
 
-	dup->put(row, col, val);
+	dup->put(row, col, val, SudokuCellType::AutoGss);
 	dup->solve();
 
 	bool result = dup->finished();
+	if(result)
+	{
+		*this = *dup;
+	}
 	delete dup;
 	return result;
 }
@@ -418,7 +422,7 @@ void Sudoku::printAll()
 	printBoard();
 	printScore();
 	printMap();
-	//printHistory();
+	printHistory();
 }
 
 void Sudoku::printBoard()
@@ -522,21 +526,6 @@ int Sudoku::toDigit(const char ch)
 	}
 }
 
-bool Sudoku::valid()
-{
-	return zeroScore() == finished();
-}
-
-bool Sudoku::zeroScore()
-{
-	updateScore();
-	for(int i = 0; i < boardSize_; i++)
-		for(int j = 0; j < boardSize_; j++)
-			if(score_[i] != 0)
-				return false;
-	return true;
-}
-
 void Sudoku::updateScore()
 {
 	for(int i = 0; i < boardSize_; i++)
@@ -565,6 +554,7 @@ bool Sudoku::forceEliminate()
 					continue;
 				if(!validPut(i, j, l))
 				{
+					cout << "[FORCE-ELIMINATED] (" << i << ", " << j << ") = " << l << endl;
 					map_[l][i][j] = 0;
 					eliminated = true;
 				}
