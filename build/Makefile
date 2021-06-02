@@ -14,5 +14,5 @@ plastics:
 list:
 	@echo Usage:
 	@echo "\tmake list"
-	@echo "\tmake platform"
+	@echo "\tmake plastics"
 
